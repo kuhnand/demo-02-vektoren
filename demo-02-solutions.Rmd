@@ -16,7 +16,7 @@ knitr::opts_chunk$set(echo = TRUE, message = FALSE, warning = FALSE)
 
 # Lade Packages
 
-In diesem Praktikum arbeiten wir mit den R Packages `{dplyr}`, `{lubridate}`, und `{ggplot2}`. 
+In diesem Praktikum arbeiten wir mit den R Packages `{dplyr}`, `{lubridate}`, und `{ggplot2}`. Allesamt sind Teil des Tidyverse und können daher mit einem Aufruf von `library(tidyverse)` geladen werden.
 
 ```{r lade-packages}
 
@@ -39,34 +39,24 @@ library(lubridate)
 
 ```{r vek-atomar}
 
-# logical Vektor
 vektor_lgl <- c(TRUE, FALSE, NA)
 
-# Zwei Eigenschaften
-
-## Typ
 typeof(vektor_lgl)
 
-## Länge
 length(vektor_lgl)
 
 vektor_lgl2 <- 1:5 == 3
-typeof(vektor_lgl2)
 
-# Numerische Vektoren
+# numerische vektoren
 
-# Double Werte sind Näherungen. Es handelt sich um Gleitkommazahlen
-vektor_num_dbl <- c(1, 5, 3)
-typeof(vektor_num_dbl) # Zahlen in R sind standardmässig vom Type double
+vektor_int <- c(1L, 5L, 3L)
 
-vektor_num_int <- c(1L, 5L, 3L)
-typeof(vektor_num_int)
+vektor_dbl <- c(10, 5, 3)
+typeof(vektor_dbl)
 
-# Character Vektoren (Zeichenvektoren)
-
+# character vektor (Zeichenvektoren) aka Strings  
 vektor_chr <- c("Apfel", "Birne", "Banane")
 typeof(vektor_chr)
-
 ```
 
 # Typumwandlung
@@ -81,8 +71,13 @@ Explizite Typumwandlung:
 ```{r vek-typ-explizit}
 
 as.numeric(vektor_lgl)
-as.character(vektor_lgl)
-as.integer(3.5)
+sum(vektor_lgl2)
+
+as.logical(as.character(vektor_lgl))
+
+as.integer(3.7)
+round(3.7)
+round(3.4)
 
 ```
 
@@ -100,15 +95,11 @@ Faktoren stellen kategoriale Daten dar, die einen festen Satz möglicher Werte a
 
 ```{r vek-faktoren}
 
-# Faktoren
 vektor_chr
-vektor_fct <- factor(vektor_chr)
+factor(vektor_chr)
+factor(vektor_chr, levels = c("Banane", "Apfel", "Birne"))
+sort(vektor_chr)
 
-vektor_fct
-typeof(vektor_fct) # Faktoren bauen auf Ganzzahlen (integer) auf
-attributes(vektor_fct)
-
-as.integer(vektor_fct)
 ```
 
 ## Datumswerte
@@ -117,34 +108,41 @@ Datumswerte sind numerische Vektoren, die die Anzahl der Tage seit dem 1. Januar
 
 ```{r vek-datum}
 
-datum_ursprung_chr <- "1970-01-01" # ISO 8601 Datumsformat
-typeof(datum_ursprung_chr)
+# ISO 8601 Datumsformat
 
-datum_ursprung_date <- as.Date(datum_ursprung_chr)
-typeof(datum_ursprung_date)
+typeof("1970-01-01")
 
-attributes(datum_ursprung_date)
-class(datum_ursprung_date)
+datum_ursprung <- as.Date("1970-01-01")
+typeof(datum_ursprung)
+attributes(datum_ursprung)
+class(datum_ursprung)
 
-as.double(datum_ursprung_date)
+wday(datum_ursprung, label = TRUE, week_start = 1)
 
-datum_ursprung_date + 1 
+attributes(datum_ursprung)$class
 
-# Was ist das Ergebnis?
+datum_ursprung
 
+as.double(datum_ursprung)
+
+datum_ursprung + 5
+as.double(datum_ursprung + 10)
 # 1. 1
 # 2. "1"
-# 3. "1970-01-02"
+# 3. "1970-01-02" x
 # 4. "1971-01-01"
 
-as.double(datum_ursprung_date + 1)
-
-Sys.Date()
 class(Sys.Date())
-as.numeric(Sys.Date())
+as.double(Sys.Date())
 
-# Was sagt uns diese Zahl?
-# 18728 = Anzahl Tage seit Ursprung (1970-01-01)
+library(palmerpenguins)
+
+penguins %>% 
+  pull(species)
+
+penguins$species
+
+penguins[[1]]
 
 ```
 
@@ -157,17 +155,26 @@ Tibbles sind Listen mit Vektoren einer einheitlichen Länge. Während ein Vektor
 inventar <- tibble(
   datum = Sys.Date(),
   frucht = vektor_chr,
-  preis = vektor_num_dbl,
-  verfuegbarkeit = vektor_lgl)
-
-typeof(inventar)
-attributes(inventar)
-class(inventar)
+  preis = vektor_dbl,
+  verfuegbarkeit = vektor_lgl
+)
 
 inventar %>% 
-  mutate(frucht = factor(frucht, levels = c("Banane", "Birne", "Apfel"))) %>% 
+  #mutate(frucht = factor(frucht, levels = c("Banane", "Birne", "Apfel"))) %>% 
+  ggplot(aes(x = reorder(frucht, -preis), y = preis)) +
+  geom_col()
+
+attributes(reorder(inventar$frucht, inventar$preis))
+
+as.double(c("Banane", "Birne", "Apfel"))
+
+desc(as.double(factor(vektor_chr)))
+
+inventar %>% 
+  mutate(frucht = factor(frucht, levels = desc(c("Banane", "Birne", "Apfel")))) %>% 
   ggplot(aes(x = frucht, y = preis)) +
   geom_col()
+
 
 ```
 
