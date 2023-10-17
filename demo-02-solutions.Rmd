@@ -1,6 +1,7 @@
 ---
 title: "Demo 2"
 subtitle: "Vektoren in R"
+Name: Andrea
 output: 
   html_document: 
     toc: yes
